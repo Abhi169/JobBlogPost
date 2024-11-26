@@ -1,0 +1,13 @@
+.no-jobs-found {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+
+.no-jobs-found h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.no-jobs-found p {
+  color: #718096; /* Tailwind's gray-600 */
+}
