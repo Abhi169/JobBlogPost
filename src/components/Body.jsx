@@ -28,7 +28,7 @@ const Body = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentJobs = filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
+  const currentJobs = filteredJobs && filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     fetchData();
@@ -165,7 +165,6 @@ const Body = () => {
               .map((_, index) => <SkeletonCard key={index} />)
           ) : currentJobs.length > 0 ? (
             currentJobs
-              .slice(0, 30)
               .map((result, index) => <Card key={index} jobData={result} />)
           ) : (
             <div className="no-jobs-found text-center mt-10 text-white">
