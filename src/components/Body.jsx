@@ -37,17 +37,43 @@ const Body = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://jobdataapi.com/api/jobs/");
-      const data = await response.json();
-      console.log(data.results);
-      setListOfJobs(data.results);
-      setFilteredJobs(data.results);
+      const response = await fetch(
+        `https://api.allorigins.win/get?url=${encodeURIComponent(
+          "https://jobdataapi.com/api/jobs/"
+        )}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const parsedData = JSON.parse(data.contents); // Parse the response contents
+        console.log(parsedData);
+
+        setListOfJobs(parsedData?.results);
+        setFilteredJobs(parsedData?.results);
+      } else {
+        throw new Error("Network response was not ok.");
+      }
     } catch (error) {
-      console.error("Error fetching jobs:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  // const fetchData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await fetch("https://jobdataapi.com/api/jobs/");
+  //     const data = await response.json();
+  //     console.log(data.results);
+  //     setListOfJobs(data.results);
+  //     setFilteredJobs(data.results);
+  //   } catch (error) {
+  //     console.error("Error fetching jobs:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Filter jobs based on selected filters
 
