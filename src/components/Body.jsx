@@ -113,7 +113,7 @@ const Body = () => {
     setSearchQuery(query);
   };
 
-  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage) || 1;
 
   return (
     <div className="min-h-screen">
