@@ -10,9 +10,10 @@ const Body = () => {
   // const [listOfJobs, setListOfJobs] = useState(jobList.results);
   // const [filteredJobs, setFilteredJobs] = useState(jobList.results); 
   // For local Testing
-  
+
   const [listOfJobs, setListOfJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
+  // Comment above to test locally with mockData
 
   const [loading, setLoading] = useState(true);
   const [showScroll, setShowScroll] = useState(false);
@@ -24,6 +25,7 @@ const Body = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -34,55 +36,57 @@ const Body = () => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.allorigins.win/get?url=${encodeURIComponent(
-          "https://jobdataapi.com/api/jobs/"
-        )}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const parsedData = JSON.parse(data.contents); // Parse the response contents
-        console.log(parsedData);
-
-        setListOfJobs(parsedData?.results);
-        setFilteredJobs(parsedData?.results);
-      } else {
-        throw new Error("Network response was not ok.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Comment above to test locally with mockData
 
   // const fetchData = async () => {
   //   setLoading(true);
   //   try {
-  //     const response = await fetch("https://jobdataapi.com/api/jobs/");
-  //     const data = await response.json();
-  //     console.log(data.results);
-  //     setListOfJobs(data.results);
-  //     setFilteredJobs(data.results);
+  //     const response = await fetch(
+  //       `https://api.allorigins.win/get?url=${encodeURIComponent(
+  //         "https://jobdataapi.com/api/jobs/"
+  //       )}`
+  //     );
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       const parsedData = JSON.parse(data.contents); // Parse the response contents when fetch with allorigin proxy
+  //       console.log(parsedData);
+  //       setListOfJobs(parsedData?.results);
+  //       setFilteredJobs(parsedData?.results);
+  //     } else {
+  //       throw new Error("Network response was not ok.");
+  //     }
   //   } catch (error) {
-  //     console.error("Error fetching jobs:", error);
+  //     console.error("Error fetching data:", error);
   //   } finally {
   //     setLoading(false);
   //   }
   // };
 
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://cors-anywhere.herokuapp.com/https://jobdataapi.com/api/jobs/");
+      const data = await response.json();
+      console.log(data.results);
+      setListOfJobs(data.results);
+      setFilteredJobs(data.results);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Filter jobs based on selected filters
 
   useEffect(() => {
+    if (!listOfJobs) return;
     const filtered = listOfJobs.filter((job) => {
       const matchesCategory =
         !selectedCategories.length ||
         selectedCategories.some((category) =>
-          job?.types.map((type) => type?.name).includes(category)
+          job?.types?.map((type) => type?.name).includes(category)
         );
 
       const matchesType =
@@ -105,7 +109,11 @@ const Body = () => {
         job?.company?.name.toLowerCase().includes(searchQuery.toLowerCase()) || job?.countries[0]?.name.toLowerCase().includes(searchQuery.toLowerCase()) || job?.types.map((type) => type?.name).join(" ").toLowerCase().includes(searchQuery.toLowerCase());
 
       return (
-        matchesCategory && matchesType && matchesLocation && matchesExperience && matchesSearchQuery
+        matchesCategory &&
+        matchesType &&
+        matchesLocation &&
+        matchesExperience &&
+        matchesSearchQuery
       );
     });
     setFilteredJobs(filtered);
@@ -137,9 +145,17 @@ const Body = () => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage) || 1;
+  const handleFilterChange = (filterSetter) => (newFilter) => {
+    filterSetter(newFilter);
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredJobs.length / itemsPerPage) || 1);
+  }, [filteredJobs]);
 
   return (
     <div className="min-h-screen">
@@ -154,49 +170,55 @@ const Body = () => {
       )}
       <div className="body p-4">
         {/* Filters Section */}
-        <div className="filter-bar flex flex-wrap justify-around items-center rounded-lg">
-          <FilterDropdown
-            label="Job Category"
-            options={["Full Time", "Internship", "Part Time"]}
-            onFilterChange={setSelectedCategories}
-          />
-          <FilterDropdown
-            label="Job Type"
-            options={["Onsite", "Remote"]}
-            onFilterChange={setSelectedTypes}
-          />
-          <FilterDropdown
-            label="Location"
-            options={[
-              ...new Set(
-                listOfJobs.map((job) => job?.countries[0]?.name).filter(Boolean)
-              ),
-            ]}
-            onFilterChange={setSelectedLocations}
-          />
-          <FilterDropdown
-            label="Experience Level"
-            options={[
-              ...new Set(
-                listOfJobs.map((job) => job.experience_level).filter(Boolean)
-              ),
-            ]}
-            onFilterChange={setSelectedExperienceLevels}
-          />
-        </div>
+        {listOfJobs && (
+          <div className="filter-bar flex flex-wrap justify-around items-center rounded-lg">
+            <FilterDropdown
+              label="Job Category"
+              options={["Full Time", "Internship", "Part Time"]}
+              onFilterChange={handleFilterChange(setSelectedCategories)}
+            />
+            <FilterDropdown
+              label="Job Type"
+              options={["Onsite", "Remote"]}
+              onFilterChange={handleFilterChange(setSelectedTypes)}
+            />
+            <FilterDropdown
+              label="Location"
+              options={[
+                ...new Set(
+                  listOfJobs
+                    ?.map((job) => job?.countries[0]?.name)
+                    .filter(Boolean) || []
+                ),
+              ]}
+              onFilterChange={handleFilterChange(setSelectedLocations)}
+            />
+            <FilterDropdown
+              label="Experience Level"
+              options={[
+                ...new Set(
+                  listOfJobs
+                    ?.map((job) => job.experience_level)
+                    .filter(Boolean) || []
+                ),
+              ]}
+              onFilterChange={handleFilterChange(setSelectedExperienceLevels)}
+            />
+          </div>
+        )}
         <div className="job-listing flex flex-wrap justify-center">
           {loading ? (
             Array(itemsPerPage)
               .fill(0)
               .map((_, index) => <SkeletonCard key={index} />)
-          ) : currentJobs.length > 0 ? (
+          ) : currentJobs && currentJobs.length > 0 ? (
             currentJobs
               .map((result, index) => <Card key={index} jobData={result} />)
           ) : (
             <div className="no-jobs-found text-center mt-10 text-white">
               <h2 className="text-2xl font-bold">No jobs found</h2>
               <p className="text-gray-600">
-                Try adjusting your search or filter to find what you're looking
+                Try adjusting your search or filter to find what you are looking
                 for.
               </p>
             </div>
@@ -239,7 +261,11 @@ const Body = () => {
           </button>
         </div>
       </div>
-      <Footer setListOfJobs={setListOfJobs} />
+      <Footer
+        setListOfJobs={setListOfJobs}
+        setFilteredJobs={setFilteredJobs}
+        setLoading={setLoading}
+      />
     </div>
   );
 };
