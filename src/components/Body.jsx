@@ -30,7 +30,7 @@ const Body = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentJobs = filteredJobs && filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
+  const currentJobs = filteredJobs && filteredJobs.slice(indexOfFirstItem, indexOfLastItem) || [];
 
   useEffect(() => {
     fetchData();
@@ -67,6 +67,9 @@ const Body = () => {
     setLoading(true);
     try {
       const response = await fetch("https://cors-anywhere.herokuapp.com/https://jobdataapi.com/api/jobs/");
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
       const data = await response.json();
       console.log(data.results);
       setListOfJobs(data.results);
