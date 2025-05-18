@@ -36,6 +36,33 @@ const Footer = ( {setListOfJobs, setFilteredJobs, setLoading } ) => {
       }
   }
 
+  const handleRemoteJobs = async (remoteJobs) => {
+    setLoading(true);
+    try {
+      if (remoteJobs === "Remote Jobs") {
+        const response = await fetch(`https://proxy-gamma-ruddy.vercel.app/api/jobdataapi.com/api/jobs/?has_remote=true`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`
+          }
+        });
+        const data = await response.json();
+        setListOfJobs(data.results);
+      } else {
+        const response = await fetch(`https://proxy-gamma-ruddy.vercel.app/api/jobdataapi.com/api/jobs/?has_remote=false`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`
+          }
+        });
+        const data = await response.json();
+        setListOfJobs(data.results);
+      }
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const countriesByRegion = [
     {
       region: "Africa",
@@ -290,6 +317,21 @@ const Footer = ( {setListOfJobs, setFilteredJobs, setLoading } ) => {
     ));
   };
 
+  const remoteJobs = ["Remote Jobs", "Onsite Jobs"];
+  const renderRemoteJobs = () => {
+    return remoteJobs.map((job) => (
+      <li key={job}>
+        <button
+          onClick={() => handleRemoteJobs(job)}
+          className="text-white hover:text-blue-500"
+        >
+          {job}
+        </button>
+      </li>
+    ));
+  };
+
+
   return (
     <div className="footer text-white flex flex-col md:flex-row justify-evenly py-4 bg-gray-800">
       <div className="footer-left md:w-1/4 m-2">
@@ -338,6 +380,10 @@ const Footer = ( {setListOfJobs, setFilteredJobs, setLoading } ) => {
         <div className="footer-section ml-2 mr-8 mb-4 md:mb-0">
           <h1 className="font-semibold mb-2 md:mt-2">Technology</h1>
           <ul className="space-y-1">{renderTechnologies()}</ul>
+        </div>
+        <div className="footer-section ml-2 mr-8 mb-4 md:mb-0">
+          <h1 className="font-semibold mb-2 md:mt-2">Remote Jobs</h1>
+          <ul className="space-y-1">{renderRemoteJobs()}</ul>
         </div>
       </div>
     </div>
