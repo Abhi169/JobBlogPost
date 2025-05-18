@@ -41,18 +41,18 @@ const Body = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://api.allorigins.win/get?url=${encodeURIComponent(
-          "https://jobdataapi.com/api/jobs/"
-        )}`
-      );
+      const response = await fetch("https://proxy-gamma-ruddy.vercel.app/api/jobdataapi.com/api/jobs/", {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`
+        }
+      });
 
       if (response.ok) {
         const data = await response.json();
-        const parsedData = JSON.parse(data.contents); // Parse the response contents when fetch with allorigin proxy
-        console.log(parsedData);
-        setListOfJobs(parsedData?.results);
-        setFilteredJobs(parsedData?.results);
+        const parsedData = data.results;
+        // console.log(parsedData);
+        setListOfJobs(parsedData);
+        setFilteredJobs(parsedData);
       } else {
         throw new Error("Network response was not ok.");
       }
@@ -62,24 +62,6 @@ const Body = () => {
       setLoading(false);
     }
   };
-
-  // const fetchData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch("https://cors-anywhere.herokuapp.com/https://jobdataapi.com/api/jobs/");
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not ok.");
-  //     }
-  //     const data = await response.json();
-  //     console.log(data.results);
-  //     setListOfJobs(data.results);
-  //     setFilteredJobs(data.results);
-  //   } catch (error) {
-  //     console.error("Error fetching jobs:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   // Filter jobs based on selected filters
 

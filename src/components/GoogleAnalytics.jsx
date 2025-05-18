@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 const GoogleAnalytics = () => {
   useEffect(() => {
-    const trackingID = import.meta.env.REACT_APP_GA_TRACKING_ID;
+    const trackingID = import.meta.env.VITE_GA_TRACKING_ID;
 
     if (!trackingID) {
       console.warn("Google Analytics tracking ID is missing.");

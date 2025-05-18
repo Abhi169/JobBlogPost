@@ -1,61 +1,15 @@
 import React from "react";
 
 const Footer = ( {setListOfJobs, setFilteredJobs, setLoading } ) => {
-  /* AllOrigin Proxy Code
-  const handleRegion = async (countryCode) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.allorigins.win/get?url=${encodeURIComponent(
-          `https://jobdataapi.com/api/jobs/?country_code=${countryCode}`
-        )}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const parsedData = JSON.parse(data.contents);
-        setListOfJobs(parsedData?.results);
-        setFilteredJobs(parsedData?.results);
-      } else {
-        throw new Error("Network response was not ok.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTechnology = async (technology) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.allorigins.win/get?url=${encodeURIComponent(
-          `https://jobdataapi.com/api/jobs/?title=${technology.toLowerCase()}`
-        )}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const parsedData = JSON.parse(data.contents);
-
-        setListOfJobs(parsedData?.results);
-        setFilteredJobs(parsedData?.results);
-      } else {
-        throw new Error("Network response was not ok.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  */
 
   const handleRegion = async (countryCode) => {
       setLoading(true);
       try {
-          const response = await fetch(`https://cors-anywhere.herokuapp.com/https://jobdataapi.com/api/jobs/?country_code=${countryCode}`);
+        const response = await fetch(`https://proxy-gamma-ruddy.vercel.app/api/jobdataapi.com/api/jobs/?country_code=${countryCode}`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`
+          }
+        });
           const data = await response.json();
           setListOfJobs(data.results);
       } catch (error) {
@@ -68,7 +22,11 @@ const Footer = ( {setListOfJobs, setFilteredJobs, setLoading } ) => {
   const handleTechnology = async (technology) => {
       setLoading(true);
       try {
-          const response = await fetch(`https://cors-anywhere.herokuapp.com/https://jobdataapi.com/api/jobs/?title=${technology.toLowerCase()}`);
+        const response = await fetch(`https://proxy-gamma-ruddy.vercel.app/api/jobdataapi.com/api/jobs/?title=${technology.toLowerCase()}`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_ACCESS_TOKEN}`
+          }
+        });
           const data = await response.json();
           setListOfJobs(data.results);
       } catch (error) {
